@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: laravel-backend
+    env: docker
+    rootDir: backend/laravel-jwt-auth
+    dockerfilePath: backend/laravel-jwt-auth/Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://laravel-backend.onrender.com
+      - key: FRONTEND_URL
+        value: http://localhost:5173   # temporary until Vercel deploy
+      - key: JWT_SECRET
+        generateValue: true
