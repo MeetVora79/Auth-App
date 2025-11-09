@@ -1,10 +1,10 @@
-# Use official PHP + Composer image
+# Use official PHP + Apache image
 FROM php:8.2-apache
 
-# Enable Apache mod_rewrite
+# Enable mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Install dependencies
+# Install PHP extensions and tools
 RUN apt-get update && apt-get install -y \
     libpng-dev libjpeg-dev libfreetype6-dev zip git unzip \
     && docker-php-ext-install pdo pdo_mysql
@@ -18,18 +18,27 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Install dependencies (no artisan commands yet)
+# Install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Copy example env file and prepare it
+# Copy example env
 RUN cp .env.example .env
 
-# Generate app key and cache config safely (now .env exists)
+# Generate key (skip error if .env missing vars)
 RUN php artisan key:generate || true
 RUN php artisan config:cache || true
 
-# Permissions fix
+# Set proper permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# ✅ Update Apache DocumentRoot to /public
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
+# ✅ Allow overrides so Laravel’s .htaccess works
+RUN echo "<Directory /var/www/html/public>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>" >> /etc/apache2/apache2.conf
 
 # Expose port
 EXPOSE 80
