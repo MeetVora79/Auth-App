@@ -21,9 +21,6 @@ COPY . .
 # Install dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Copy example env
-RUN cp .env.example .env
-
 # Generate key (skip error if .env missing vars)
 RUN php artisan key:generate || true
 RUN php artisan config:cache || true
