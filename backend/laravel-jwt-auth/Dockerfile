@@ -40,5 +40,9 @@ RUN echo "<Directory /var/www/html/public>\n\
 # Expose port
 EXPOSE 80
 
+# Clear Laravel caches before starting Apache
+RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
+
+
 # Start Apache
 CMD ["apache2-foreground"]
