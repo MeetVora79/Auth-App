@@ -1,0 +1,31 @@
+services:
+  # Backend (Laravel)
+  - type: web
+    name: laravel-backend
+    env: php
+    rootDir: backend/laravel-jwt-auth
+    buildCommand: |
+      composer install
+      php artisan key:generate
+      php artisan config:cache
+    startCommand: php artisan serve --host 0.0.0.0 --port 10000
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://laravel-backend.onrender.com
+      - key: FRONTEND_URL
+        value: http://localhost:5173 
+
+  # Frontend (React)
+  - type: web
+    name: react-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://laravel-backend.onrender.com/api
