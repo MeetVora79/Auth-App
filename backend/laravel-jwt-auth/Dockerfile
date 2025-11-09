@@ -4,10 +4,14 @@ FROM php:8.2-apache
 # Enable mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Install PHP extensions
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    zip \
     libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
