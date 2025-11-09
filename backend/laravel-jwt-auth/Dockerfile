@@ -40,8 +40,14 @@ RUN echo "<Directory /var/www/html/public>\n\
 # Expose port
 EXPOSE 80
 
-# Clear Laravel caches before starting Apache
-RUN php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear
+# Force MySQL connection and clear caches safely
+RUN rm -f bootstrap/cache/config.php && \
+    php -r "file_exists('.env') || copy('.env.example', '.env');" && \
+    php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan route:clear && \
+    php artisan view:clear || true
+
 
 
 # Start Apache
