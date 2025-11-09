@@ -18,10 +18,18 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Install dependencies and cache config
+# Install dependencies (no artisan commands yet)
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-RUN php artisan key:generate
-RUN php artisan config:cache
+
+# Copy example env file and prepare it
+RUN cp .env.example .env
+
+# Generate app key and cache config safely (now .env exists)
+RUN php artisan key:generate || true
+RUN php artisan config:cache || true
+
+# Permissions fix
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port
 EXPOSE 80
